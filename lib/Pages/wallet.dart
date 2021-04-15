@@ -6,8 +6,7 @@ class Wallet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      theme: ThemeData.dark(),
       home: Walletful(),
     );
   }
@@ -49,12 +48,12 @@ class _WalletfulState extends State<Walletful> {
                           children: <TextSpan>[
                         TextSpan(
                             text: 'Bell',
-                            style: TextStyle(color: Colors.white, fontSize: 34))
+                            style: TextStyle(color: Colors.white,fontSize: 34))
                       ])),
                   HeightBox(MediaQuery.of(context).size.height * 0.02)
                 ],
               ),
-              subtitle: "₹ 0".text.size(28).white.make(),
+              subtitle: "₹ 0".text.size(28).make(),
               onTap: () {},
             ),
             HeightBox(MediaQuery.of(context).size.height * 0.02),
