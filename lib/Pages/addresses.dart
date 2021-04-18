@@ -1,42 +1,47 @@
 import 'package:app_task4/Files/addressList.dart';
-import 'package:app_task4/Pages/screenSelector.dart';
+import 'package:app_task4/Pages/addressMap.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class Address extends StatelessWidget {
+// class Address extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       theme: ThemeData.light(),
+//       darkTheme: ThemeData.dark(),
+//       home: Addressful(),
+//     );
+//   }
+// }
+
+class Address extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      home: Addressful(),
-    );
-  }
+  _AddressState createState() => _AddressState();
 }
 
-class Addressful extends StatefulWidget {
-  @override
-  _AddressfulState createState() => _AddressfulState();
-}
-
-class _AddressfulState extends State<Addressful> {
+class _AddressState extends State<Address> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: true,
           leading: IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => Screenless()))),
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
           title: Text("Manage Addresses"),
           backgroundColor: Color(0xff480f18),
         ),
         body: Column(
           children: [
+            HeightBox(MediaQuery.of(context).size.height * 0.02),
+            FlatButton(onPressed: (){
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => AddressMap()));
+            }, child: "+ ADD NEW ADDRESS".text.orange400.make()),
             Expanded(
               child: ListView.separated(
-                  itemCount: Addresses.addressType.length,
+                  itemCount: Addresses.addressType.length+2,
                   scrollDirection: Axis.vertical,
                   separatorBuilder: (context, index) => Divider(
                       thickness: 1,
@@ -45,6 +50,13 @@ class _AddressfulState extends State<Addressful> {
                   shrinkWrap: true,
                   //itemExtent: MediaQuery.of(context).size.height * 0.1,
                   itemBuilder: (BuildContext context, int index) {
+                    if(index == 0 || index == Addresses.addressType.length+1)
+                      {
+                        return Divider(
+                            thickness: 1,
+                            color: Colors.black
+                        );
+                      }
                     return ListTile(
                       leading:
                       Icon(Icons.location_on_outlined, color: Colors.blue, size: 34),
@@ -53,7 +65,7 @@ class _AddressfulState extends State<Addressful> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           HeightBox(MediaQuery.of(context).size.height * 0.02),
-                          Addresses.addressType[index].text.make(),
+                          Addresses.addressType[index-1].text.make(),
                         ],
                       ),
                       subtitle:
@@ -62,7 +74,7 @@ class _AddressfulState extends State<Addressful> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           HeightBox(MediaQuery.of(context).size.height * 0.02),
-                          Addresses.address[index].text.make(),
+                          Addresses.address[index-1].text.make(),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,

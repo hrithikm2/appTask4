@@ -2,31 +2,31 @@ import 'package:app_task4/Pages/screenSelector.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class Wallet extends StatelessWidget {
+// class Wallet extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       theme: ThemeData.dark(),
+//       home: Walletful(),
+//     );
+//   }
+// }
+
+class Wallet extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData.dark(),
-      home: Walletful(),
-    );
-  }
+  _WalletState createState() => _WalletState();
 }
 
-class Walletful extends StatefulWidget {
-  @override
-  _WalletfulState createState() => _WalletfulState();
-}
-
-class _WalletfulState extends State<Walletful> {
+class _WalletState extends State<Wallet> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: true,
           leading: IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => Screenless()))),
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
           title: Text("Wallet Transactions"),
           backgroundColor: Color(0xff480f18),
         ),

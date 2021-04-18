@@ -1,15 +1,21 @@
+import 'package:app_task4/Pages/addressMap.dart';
 import 'package:app_task4/Pages/addresses.dart';
 import 'package:app_task4/Pages/contactUs.dart';
 import 'package:app_task4/Pages/wallet.dart';
+import 'package:app_task4/Services/locationstoring.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Screenless extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return ChangeNotifierProvider(
+      create: (context) => LocationChange(),
+      child:  MaterialApp(
+        debugShowCheckedModeBanner : false,
         theme: ThemeData.light(),
         darkTheme: ThemeData.dark(),
-        home: ScreenSelector());
+        home: AddressMap()));
   }
 }
 

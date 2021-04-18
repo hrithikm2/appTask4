@@ -5,32 +5,32 @@ import 'package:flutter/material.dart';
 import 'package:app_task4/Files/contactnumbers.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class ContactUs extends StatelessWidget {
+// class ContactUs extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       theme: ThemeData.light(),
+//       darkTheme: ThemeData.dark(),
+//       home: Contactful(),
+//     );
+//   }
+// }
+
+class ContactUs extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      home: Contactful(),
-    );
-  }
+  _ContactUsState createState() => _ContactUsState();
 }
 
-class Contactful extends StatefulWidget {
-  @override
-  _ContactfulState createState() => _ContactfulState();
-}
-
-class _ContactfulState extends State<Contactful> {
+class _ContactUsState extends State<ContactUs> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: true,
           leading: IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => Screenless()))),
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
           title: Text("Contact Us"),
           backgroundColor: Color(0xff480f18),
         ),
