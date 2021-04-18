@@ -8,6 +8,19 @@ import 'package:provider/provider.dart';
 import 'package:search_map_place/search_map_place.dart';
 import 'package:velocity_x/velocity_x.dart';
 
+// class Addless extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return ChangeNotifierProvider(
+//         create: (context) => LocationChange(),
+//         child:  MaterialApp(
+//             debugShowCheckedModeBanner : false,
+//             theme: ThemeData.light(),
+//             darkTheme: ThemeData.dark(),
+//             home: AddressMap()));
+//   }
+// }
+
 class AddressMap extends StatefulWidget {
   @override
   _AddressMapState createState() => _AddressMapState();
@@ -29,39 +42,51 @@ class _AddressMapState extends State<AddressMap> {
     final locationChange = Provider.of<LocationChange>(context);
     return Scaffold(
         body:(locationChange.currentLocation == null) ? Center(child: CircularProgressIndicator()) :
-        Column(
+        Stack(
           children: [
-            HeightBox(MediaQuery.of(context).size.height *0.03),
-            Container(
-              padding: EdgeInsets.all(20),
-              color: Colors.black26,
-              child: 'Deliver to $address'.text.make(),
+            Column(
+              children: [
+                HeightBox(MediaQuery.of(context).size.height *0.03),
+                Container(
+                  padding: EdgeInsets.all(20),
+                  color: Colors.black26,
+                  child: 'Deliver to $address'.text.make(),
+                ),
+                HeightBox(MediaQuery.of(context).size.height *0.03),
+                SearchMapPlaceWidget(
+                  hasClearButton: true,
+                placeType: PlaceType.address,
+                placeholder: 'Enter Location',
+                apiKey:'AIzaSyCsn04If8EbRrj_NyHks8dv3YvznNf60T8',
+                onSelected: (Place place) async {
+                  Geolocation geolocation = await place.geolocation;
+                  mapController.animateCamera(CameraUpdate.newLatLng(geolocation.coordinates));
+                  mapController.animateCamera(CameraUpdate.newLatLngBounds(geolocation.bounds, 0));
+                }),
+                HeightBox(MediaQuery.of(context).size.height *0.02),
+                Flexible(
+                  child: GoogleMap(
+                    onMapCreated: (GoogleMapController googleMapController){
+                      setState(() {
+                        mapController = googleMapController;
+                      });
+                    },
+                    mapType: MapType.normal,
+                    myLocationEnabled: true,
+                    initialCameraPosition: CameraPosition(target: LatLng(locationChange.currentLocation.latitude,locationChange.currentLocation.longitude),
+                    zoom: 14)
+                  ),
+                ),
+              ],
             ),
-            HeightBox(MediaQuery.of(context).size.height *0.03),
-            SearchMapPlaceWidget(
-              hasClearButton: true,
-            placeType: PlaceType.address,
-            placeholder: 'Enter Location',
-            apiKey:'AIzaSyCsn04If8EbRrj_NyHks8dv3YvznNf60T8',
-            onSelected: (Place place) async {
-              Geolocation geolocation = await place.geolocation;
-              mapController.animateCamera(CameraUpdate.newLatLng(geolocation.coordinates));
-              mapController.animateCamera(CameraUpdate.newLatLngBounds(geolocation.bounds, 0));
-            }),
-            HeightBox(MediaQuery.of(context).size.height *0.02),
-            Flexible(
-              child: GoogleMap(
-                onMapCreated: (GoogleMapController googleMapController){
-                  setState(() {
-                    mapController = googleMapController;
-                  });
-                },
-                mapType: MapType.normal,
-                myLocationEnabled: true,
-                initialCameraPosition: CameraPosition(target: LatLng(locationChange.currentLocation.latitude,locationChange.currentLocation.longitude),
-                zoom: 14)
-              ),
-            ),
+            Positioned(
+              top: 30,
+              left:20,
+              child: IconButton(icon: Icon(Icons.arrow_back),
+              onPressed: (){
+                Navigator.of(context).pop();
+              },),
+            )
           ],
         )
     );

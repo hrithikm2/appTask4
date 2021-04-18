@@ -10,12 +10,12 @@ class Screenless extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => LocationChange(),
-      child:  MaterialApp(
-        debugShowCheckedModeBanner : false,
-        theme: ThemeData.light(),
-        darkTheme: ThemeData.dark(),
-        home: AddressMap()));
+        create: (context) => LocationChange(),
+    child: MaterialApp(
+      debugShowCheckedModeBanner : false,
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      home: ScreenSelector()));
   }
 }
 
