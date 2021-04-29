@@ -1,16 +1,5 @@
-import 'package:app_task4/Pages/screenSelector.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
-
-// class Wallet extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       theme: ThemeData.dark(),
-//       home: Walletful(),
-//     );
-//   }
-// }
 
 class Wallet extends StatefulWidget {
   @override

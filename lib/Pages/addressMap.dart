@@ -1,94 +1,186 @@
-// THIS PAGE IS THE WIDGET THAT OPENS GOOGLE MAPS ONCE PRESSED ON '+ ADD NEW ADDRESS button in the Addresses.dart'
-
-import 'package:app_task4/Services/locationstoring.dart';
+import 'dart:async';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:geocoder/geocoder.dart';
+import 'package:flutter/painting.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:provider/provider.dart';
-import 'package:search_map_place/search_map_place.dart';
+import 'package:location/location.dart';
+import 'package:geocoder/geocoder.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-// class Addless extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return ChangeNotifierProvider(
-//         create: (context) => LocationChange(),
-//         child:  MaterialApp(
-//             debugShowCheckedModeBanner : false,
-//             theme: ThemeData.light(),
-//             darkTheme: ThemeData.dark(),
-//             home: AddressMap()));
-//   }
-// }
 
 class AddressMap extends StatefulWidget {
+  AddressMap({Key key, this.title}) : super(key: key);
+  final String title;
   @override
   _AddressMapState createState() => _AddressMapState();
 }
-class _AddressMapState extends State<AddressMap> {
-  String address = '';
-  GoogleMapController mapController;
-  final locationchange = new LocationChange();
 
-  addressFromCoordinates() async{
-    final userCoordinates =  Coordinates(locationchange.currentLocation.latitude, locationchange.currentLocation.longitude);
-    var userAddress = await Geocoder.local.findAddressesFromCoordinates(userCoordinates);
-    address = userAddress.first.addressLine;
+class _AddressMapState extends State<AddressMap> {
+
+  Location _locationTracker = Location();
+  Marker marker;
+  String _address;
+  GoogleMapController _controller;
+  Uint8List customIcon;
+  LatLng pinCoordinates;
+  List<Address> add;
+
+  static final CameraPosition initialLocation = CameraPosition(
+    target: LatLng(37.42796133580664, -122.085749655962),
+    zoom: 14.4746,
+  );
+
+  Future<Uint8List> getMarker() async {
+    ByteData byteData =
+    await DefaultAssetBundle.of(context).load('resources/pin.png');
+    customIcon = byteData.buffer.asUint8List();
+    return customIcon;
+  }
+
+  void updateMarkerAndCircle(LocationData newLocalData, Uint8List imageData) {
+    LatLng latlng = LatLng(newLocalData.latitude, newLocalData.longitude);
+    this.setState(() {
+      marker = Marker(
+          markerId: MarkerId("home"),
+          position: latlng,
+          draggable: false,
+          icon: BitmapDescriptor.fromBytes(imageData));
+    });
+  }
+
+  void getCurrentLocation() async {
+    Uint8List imageData = await getMarker();
+    LocationData location = await _locationTracker.getLocation();
+
+    updateMarkerAndCircle(location, imageData);
+    if (_controller != null) {
+      _controller.animateCamera(
+          CameraUpdate.newCameraPosition(new CameraPosition(
+              bearing: 0,
+              target: LatLng(
+                  location.latitude, location.longitude),
+              tilt: 85,
+              zoom: 24.00)));
+    }
+    setState(() {
+      _getAddress(location.latitude, location.longitude)
+          .then((value) {
+        setState(() {
+          _address = "${value.first.addressLine}";
+        });
+      });
+    });
   }
 
 
   @override
   Widget build(BuildContext context) {
-    final locationChange = Provider.of<LocationChange>(context);
     return Scaffold(
-        body:(locationChange.currentLocation == null) ? Center(child: CircularProgressIndicator()) :
-        Stack(
-          children: [
-            Column(
+      appBar: AppBar(
+        backgroundColor: Colors.orange,
+        title: Text("Manage Addresses"),
+      ),
+      body: Column(
+        children: [
+          Flexible(
+            child: GoogleMap(
+                mapType: MapType.normal,
+                zoomGesturesEnabled: false,
+                zoomControlsEnabled: false,
+                initialCameraPosition: initialLocation,
+                markers: Set.of((marker != null) ? [marker] : []),
+                onMapCreated: (GoogleMapController controller) {
+                  _controller = controller;
+                  getCurrentLocation();
+                },
+                onTap: _setMarker),
+          ),
+          Card(
+            elevation: 40,
+            color: Colors.white,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                HeightBox(MediaQuery.of(context).size.height *0.03),
+                Text('Set delivery location',
+                    style: TextStyle(
+                      color: Colors.black,
+                    )),
+                HeightBox(10),
                 Container(
-                  padding: EdgeInsets.all(20),
-                  color: Colors.black26,
-                  child: 'Deliver to $address'.text.make(),
-                ),
-                HeightBox(MediaQuery.of(context).size.height *0.03),
-                SearchMapPlaceWidget(
-                  hasClearButton: true,
-                placeType: PlaceType.address,
-                placeholder: 'Enter Location',
-                apiKey:'AIzaSyCsn04If8EbRrj_NyHks8dv3YvznNf60T8',
-                onSelected: (Place place) async {
-                  Geolocation geolocation = await place.geolocation;
-                  mapController.animateCamera(CameraUpdate.newLatLng(geolocation.coordinates));
-                  mapController.animateCamera(CameraUpdate.newLatLngBounds(geolocation.bounds, 0));
-                }),
-                HeightBox(MediaQuery.of(context).size.height *0.02),
-                Flexible(
-                  child: GoogleMap(
-                    onMapCreated: (GoogleMapController googleMapController){
-                      setState(() {
-                        mapController = googleMapController;
-                      });
-                    },
-                    mapType: MapType.normal,
-                    myLocationEnabled: true,
-                    initialCameraPosition: CameraPosition(target: LatLng(locationChange.currentLocation.latitude,locationChange.currentLocation.longitude),
-                    zoom: 14)
+                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Location',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 8,
+                          )),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            child: Column(
+                              children: [
+                                Text('$_address',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                    ),
+                                    overflow: TextOverflow.ellipsis),
+                                Divider(
+                                    endIndent: 0,
+                                    thickness: 1,
+                                    color: Colors.black),
+                              ],
+                            ),
+                          ),
+                          TextButton(
+                            child: Text(
+                              "EDIT",
+                              style: TextStyle(
+                                color: Colors.orange,
+                                fontSize: 12,
+                              ),
+                            ),
+                            onPressed: () {},
+                          )
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            Positioned(
-              top: 30,
-              left:20,
-              child: IconButton(icon: Icon(Icons.arrow_back),
-              onPressed: (){
-                Navigator.of(context).pop();
-              },),
-            )
-          ],
-        )
+          )
+        ],
+      ),
     );
+  }
+
+  Future<List<Address>> _getAddress(double lat, double lang) async {
+    final coordinates = new Coordinates(lat, lang);
+    add = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+    return add;
+  }
+
+  _setMarker(LatLng tappedLoc) {
+    setState(() {
+      marker = Marker(
+          markerId: MarkerId("home"),
+          position: tappedLoc,
+          draggable: false,
+          icon: BitmapDescriptor.fromBytes(customIcon));
+    });
+    pinCoordinates = tappedLoc;
+    setState(() {
+      _getAddress(pinCoordinates.latitude, pinCoordinates.longitude)
+          .then((value) {
+        setState(() {
+          _address = "${value.first.addressLine}";
+        });
+      });
+    });
   }
 }
